@@ -72,20 +72,23 @@ BOOL CControlBarContext::Dock(CValue** ppParams)
 
 BOOL CControlBarContext::CreateControl(CValue& rValue, CValue** ppValues)
 {
-/*	m_pCBar->CreateControl(ppValues[0]->GetString());
+	m_pCBar->CreateControl(ppValues[0]->GetString());
  	LPUNKNOWN iUnkControl=m_pCBar->m_pChild->GetControlUnknown();
  	iUnkControl->AddRef();
  	DispatchToValue(reinterpret_cast<IUnknown**>(&iUnkControl), &rValue);
-	/**/
+	return TRUE;
+}
 
+BOOL CControlBarContext::CreateExplorerBar(CValue& rValue, CValue** ppValues)
+{
 	CWndDirectUI* pW = new CWndDirectUI();
-	pW->SetStyle(CWndDirectUI::styleXP);
+	//pW->SetStyle(CWndDirectUI::styleXP);
 	pW->Create(CRect(0,0,300,0), m_pCBar, 1000);
-	//pW->SetStyle(CWndDirectUI::styleXPclassic);
 	pW->InitFromMenu(151);
 	int nGroup=pW->AddGroup("√руппа1");
 	pW->AddItem(nGroup, new CDirectUIItemStatic(_T("—сылка1")));
 	m_pCBar->m_pChild = pW;
+	return TRUE;
 	return TRUE;
 }
 
@@ -100,5 +103,15 @@ BOOL CControlBarContext::Set_Visible(CValue const& value)
 	int v = value.GetNumeric();
 	m_pCBar->ShowWindow(v? SW_SHOW : SW_HIDE);
 	pMainFrame->RecalcLayout(1);
+	return TRUE;
+}
+
+BOOL CControlBarContext::Get_Caption(CValue& value) const
+{
+	return TRUE;
+}
+
+BOOL CControlBarContext::Set_Caption(CValue const& value)
+{
 	return TRUE;
 }
