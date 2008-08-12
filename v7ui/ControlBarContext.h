@@ -20,8 +20,11 @@ public:
 	BL_BEGIN_CONTEXT("DockPanel","—тыкуема€ѕанель");
 	BL_PROC(Dock,"ѕристыковать",1);
 	BL_FUNC(CreateControl,"—оздатьЁлемент”правлени€",2);
+	BL_FUNC(CreateExplorerBar,"—оздатьѕанельƒействий",1);
 	BL_PROP_RW(Visible,"¬идимость");
 	BL_PROP_WRITE(Visible);
+	BL_PROP_RW(Caption,"«аголовок");
+	BL_PROP_WRITE(Caption);
 	BL_END_CONTEXT();
 private:
 	CMyControlBar* m_pCBar;
