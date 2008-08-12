@@ -79,11 +79,12 @@ BOOL CControlBarContext::CreateControl(CValue& rValue, CValue** ppValues)
 	/**/
 
 	CWndDirectUI* pW = new CWndDirectUI();
+	pW->SetStyle(CWndDirectUI::styleXP);
 	pW->Create(CRect(0,0,300,0), m_pCBar, 1000);
 	//pW->SetStyle(CWndDirectUI::styleXPclassic);
 	pW->InitFromMenu(151);
-	int nGroup=pW->AddGroup("ляляля");
-	pW->AddItem(nGroup, new CDirectUIItemStatic(_T("абассацца гыгыгы")));
+	int nGroup=pW->AddGroup("Группа1");
+	pW->AddItem(nGroup, new CDirectUIItemStatic(_T("Ссылка1")));
 	m_pCBar->m_pChild = pW;
 	return TRUE;
 }

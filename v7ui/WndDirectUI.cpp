@@ -149,146 +149,7 @@ void CDirectUIGroup::OnDraw(CDC* pDC, CRect rcItem, HTHEME hTheme, int nOffsetY,
 			pDC->SelectObject(pnOld);
 		}
 		break;
-	case CWndDirectUI::styleXPclassic:
-		{
-			CPen*   pnOld;
-			CFont*  fnOld;
-			CBrush* brOld;
-
-			CPen   pnBorder;
-			CPen   pnMarker;
-			CBrush brHeader;
-			CBrush brItemArea;
-			COLORREF clBorder   = GetSysColor(COLOR_3DFACE);
-			COLORREF clText     = GetSysColor(COLOR_BTNTEXT);
-			COLORREF clItemArea = GetSysColor(COLOR_WINDOW);
-			pnBorder.CreatePen(PS_SOLID, 1, clBorder);
-			pnMarker.CreatePen(PS_SOLID, 1, clText);
-			brHeader.CreateSolidBrush(clBorder);
-			brItemArea.CreateSolidBrush(clItemArea);
-
-			// Draw Header
-			LOGFONT lf;
-			CFont::FromHandle((HFONT) GetStockObject(ANSI_VAR_FONT))->GetLogFont(&lf);
-			CFont fnHeader;
-			lf.lfWeight = FW_BOLD;
-			fnHeader.CreateFontIndirect(&lf);
-			fnOld= pDC->SelectObject(&fnHeader);
-
-			// Draw Header
-			CRect rcHeader;
-			CRect rcHeaderTextArea;
-			rcHeader.SetRect(rcItem.left, rcItem.top, rcItem.right, rcItem.top + GetSystemMetrics(SM_CYCAPTION)); // Whole top area
-			pDC->SetTextColor(clText);
-			pDC->SetBkColor(clBorder);
-			rcHeaderTextArea.SetRect(rcHeader.left+nHeaderRadius, rcHeader.top, rcHeader.right-nHeaderRadius, rcHeader.bottom); // area between
-			brOld = pDC->SelectObject(&brHeader);
-			pDC->FillSolidRect(rcHeader, clBorder);
-			pDC->DrawText(m_strName, rcHeaderTextArea, DT_LEFT|DT_SINGLELINE|DT_VCENTER|DT_END_ELLIPSIS);
-
-			// Draw the Expand/Collapse button
-			const int nBtnSpace = 2;
-			int nBtnSize;
-			nBtnSize = GetSystemMetrics(SM_CYCAPTION)-nBtnSpace-nBtnSpace;
-			m_rcExpandCollapseBtn.SetRect(rcItem.right-nHeaderRadius-nBtnSize, rcItem.top +nBtnSpace, rcItem.right-nHeaderRadius, rcItem.top+nBtnSpace+nBtnSize);
-			if (m_uiItemState & ODS_SELECTED) pDC->Draw3dRect(m_rcExpandCollapseBtn, GetSysColor(COLOR_3DHILIGHT), GetSysColor(COLOR_3DSHADOW));
-			pnOld = pDC->SelectObject(&pnMarker);
-			CPoint ptCenter = m_rcExpandCollapseBtn.CenterPoint();
-			CPoint ptLeft   = ptCenter +CPoint(-4, m_bIsCollapsed ? -4:4);
-			CPoint ptRight  = ptCenter +CPoint( 4, m_bIsCollapsed ? -4:4);
-			pDC->MoveTo(ptCenter);
-			pDC->LineTo(ptLeft);
-			pDC->MoveTo(ptCenter);
-			pDC->LineTo(ptRight);
-			ptCenter.Offset(0, m_bIsCollapsed ?3:-3);
-			ptLeft.Offset(0, m_bIsCollapsed ?3:-3);
-			ptRight.Offset(0, m_bIsCollapsed ?3:-3);
-			pDC->MoveTo(ptCenter);
-			pDC->LineTo(ptLeft);
-			pDC->MoveTo(ptCenter);
-			pDC->LineTo(ptRight);
-			m_rcExpandCollapseBtn.left = rcHeader.left;
-
-			// Now draw the lighter area for all items
-			pDC->SelectObject(&pnBorder);
-			pDC->SelectObject(&brItemArea);
-			pDC->Rectangle(rcItem.left, rcHeaderTextArea.bottom-1, rcItem.right, rcItem.bottom);
-
-			// Draw Items
-			pDC->SelectObject(&pnMarker);
-			if (!m_bIsCollapsed)
-			{
-				CRect rcItems;
-				rcItems.SetRect(rcItem.left+1, rcHeaderTextArea.bottom, rcItem.right-1, rcHeaderTextArea.bottom);
-				if (m_pImageList) m_pImageList->SetBkColor(clItemArea);
-				for (POSITION pos = m_lstItems.GetHeadPosition(); pos;)
-				{
-					rcItems.top     = rcItems.bottom;
-					rcItems.bottom  = rcItems.top + m_lstItems.GetAt(pos)->GetItemHeight(pDC, *m_pnStyle, NULL);
-					m_lstItems.GetNext(pos)->OnDraw(pDC, rcItems, m_pImageList, *m_pnStyle, NULL, nOffsetY, pParent);
-				}
-			}
-			pDC->SelectObject(fnOld);
-			pDC->SelectObject(pnOld);
-			pDC->SelectObject(brOld);
-		}
-		break;
-#ifdef USE_THEMES
-	case CWndDirectUI::styleThemed:
-		if (g_xpStyle.IsAppThemed() & (hTheme != 0))
-		{
-			CRect rcHeader, rcHeaderTextArea;
-			rcHeader.SetRect(rcItem.left, rcItem.top, rcItem.right, rcItem.top + GetSystemMetrics(SM_CYCAPTION)); // Whole top area
-			if ((*m_pnStyle == CWndDirectUI::styleThemed) & g_xpStyle.IsAppThemed()) 
-				rcHeader.bottom = rcHeader.top + MulDiv(rcHeader.Height(), 9, 8);
-
-			g_xpStyle.DrawThemeBackground(hTheme, pDC->m_hDC, EBP_NORMALGROUPHEAD, 0, &rcHeader, 0);
-			g_xpStyle.GetThemeBackgroundContentRect(hTheme, pDC->m_hDC, EBP_NORMALGROUPHEAD, 0, rcHeader,  &rcHeaderTextArea);
-
-			int nTextLen = strlen(m_strName); 
-			int mlen = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, m_strName, nTextLen + 1, NULL, 0); 
-			WCHAR* output = new WCHAR[mlen];
-			if(output)
-			{
-				MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, m_strName, nTextLen + 1, output, mlen);
-				g_xpStyle.DrawThemeText(hTheme, pDC->m_hDC, EBP_NORMALGROUPHEAD, 0, output, -1, DT_LEFT|DT_VCENTER | DT_SINGLELINE|DT_END_ELLIPSIS, 0, &rcHeaderTextArea);
-				delete output;
-			}
-
-			const int nBtnSpace = 2;
-			int nBtnSize;
-			nBtnSize = GetSystemMetrics(SM_CYCAPTION)-nBtnSpace-nBtnSpace;
-			m_rcExpandCollapseBtn.SetRect(rcItem.right-nHeaderRadius-nBtnSize, rcItem.top +nBtnSpace, rcItem.right-nHeaderRadius, rcItem.top+nBtnSpace+nBtnSize);
-			g_xpStyle.DrawThemeBackground(hTheme, pDC->m_hDC, m_bIsCollapsed ? EBP_NORMALGROUPEXPAND:EBP_NORMALGROUPCOLLAPSE, (m_uiItemState & ODS_SELECTED) ? EBNGC_HOT: EBNGC_NORMAL, &m_rcExpandCollapseBtn, 0);
-			m_rcExpandCollapseBtn.left = rcHeader.left;
-			if (!m_bIsCollapsed)
-				g_xpStyle.DrawThemeBackground(hTheme, pDC->m_hDC, EBP_NORMALGROUPBACKGROUND, 0, CRect(rcItem.left, rcHeader.bottom-1, rcItem.right, rcItem.bottom), 0);
-
-			CPen*   pnOld;
-			CPen   pnUnderline;
-			pnUnderline.CreatePen(PS_SOLID, 1, GetSysColor(COLOR_HIGHLIGHTTEXT));
-			pnOld = pDC->SelectObject(&pnUnderline);
-
-			if (!m_bIsCollapsed)
-			{
-				CRect rcItems;
-				g_xpStyle.GetThemeBackgroundContentRect(hTheme, pDC->m_hDC, EBP_NORMALGROUPBACKGROUND, 0, rcHeader,  &rcItems);
-				rcItems.top = rcHeader.bottom;
-				rcItems.bottom = rcHeader.bottom;
-				for (POSITION pos = m_lstItems.GetHeadPosition(); pos;)
-				{
-					rcItems.top     = rcItems.bottom;
-					rcItems.bottom  = rcItems.top + m_lstItems.GetAt(pos)->GetItemHeight(pDC, *m_pnStyle, NULL);
-					m_lstItems.GetNext(pos)->OnDraw(pDC, rcItems, m_pImageList, *m_pnStyle, hTheme, nOffsetY, pParent);
-				}
-			}
-			pDC->SelectObject(pnOld);
-
-			break;
-		}
-#endif
 	case CWndDirectUI::styleXP:
-	default:
 		{
 			CPen*   pnOld;
 			CFont*  fnOld;
@@ -391,6 +252,145 @@ void CDirectUIGroup::OnDraw(CDC* pDC, CRect rcItem, HTHEME hTheme, int nOffsetY,
 				}
 			}
 
+			pDC->SelectObject(fnOld);
+			pDC->SelectObject(pnOld);
+			pDC->SelectObject(brOld);
+		}
+		break;
+#ifdef USE_THEMES
+	case CWndDirectUI::styleThemed:
+		if (g_xpStyle.IsAppThemed() & (hTheme != 0))
+		{
+			CRect rcHeader, rcHeaderTextArea;
+			rcHeader.SetRect(rcItem.left, rcItem.top, rcItem.right, rcItem.top + GetSystemMetrics(SM_CYCAPTION)); // Whole top area
+			if ((*m_pnStyle == CWndDirectUI::styleThemed) & g_xpStyle.IsAppThemed()) 
+				rcHeader.bottom = rcHeader.top + MulDiv(rcHeader.Height(), 9, 8);
+
+			g_xpStyle.DrawThemeBackground(hTheme, pDC->m_hDC, EBP_NORMALGROUPHEAD, 0, &rcHeader, 0);
+			g_xpStyle.GetThemeBackgroundContentRect(hTheme, pDC->m_hDC, EBP_NORMALGROUPHEAD, 0, rcHeader,  &rcHeaderTextArea);
+
+			int nTextLen = strlen(m_strName); 
+			int mlen = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, m_strName, nTextLen + 1, NULL, 0); 
+			WCHAR* output = new WCHAR[mlen];
+			if(output)
+			{
+				MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, m_strName, nTextLen + 1, output, mlen);
+				g_xpStyle.DrawThemeText(hTheme, pDC->m_hDC, EBP_NORMALGROUPHEAD, 0, output, -1, DT_LEFT|DT_VCENTER | DT_SINGLELINE|DT_END_ELLIPSIS, 0, &rcHeaderTextArea);
+				delete output;
+			}
+
+			const int nBtnSpace = 2;
+			int nBtnSize;
+			nBtnSize = GetSystemMetrics(SM_CYCAPTION)-nBtnSpace-nBtnSpace;
+			m_rcExpandCollapseBtn.SetRect(rcItem.right-nHeaderRadius-nBtnSize, rcItem.top +nBtnSpace, rcItem.right-nHeaderRadius, rcItem.top+nBtnSpace+nBtnSize);
+			g_xpStyle.DrawThemeBackground(hTheme, pDC->m_hDC, m_bIsCollapsed ? EBP_NORMALGROUPEXPAND:EBP_NORMALGROUPCOLLAPSE, (m_uiItemState & ODS_SELECTED) ? EBNGC_HOT: EBNGC_NORMAL, &m_rcExpandCollapseBtn, 0);
+			m_rcExpandCollapseBtn.left = rcHeader.left;
+			if (!m_bIsCollapsed)
+				g_xpStyle.DrawThemeBackground(hTheme, pDC->m_hDC, EBP_NORMALGROUPBACKGROUND, 0, CRect(rcItem.left, rcHeader.bottom-1, rcItem.right, rcItem.bottom), 0);
+
+			CPen*   pnOld;
+			CPen   pnUnderline;
+			pnUnderline.CreatePen(PS_SOLID, 1, GetSysColor(COLOR_HIGHLIGHTTEXT));
+			pnOld = pDC->SelectObject(&pnUnderline);
+
+			if (!m_bIsCollapsed)
+			{
+				CRect rcItems;
+				g_xpStyle.GetThemeBackgroundContentRect(hTheme, pDC->m_hDC, EBP_NORMALGROUPBACKGROUND, 0, rcHeader,  &rcItems);
+				rcItems.top = rcHeader.bottom;
+				rcItems.bottom = rcHeader.bottom;
+				for (POSITION pos = m_lstItems.GetHeadPosition(); pos;)
+				{
+					rcItems.top     = rcItems.bottom;
+					rcItems.bottom  = rcItems.top + m_lstItems.GetAt(pos)->GetItemHeight(pDC, *m_pnStyle, NULL);
+					m_lstItems.GetNext(pos)->OnDraw(pDC, rcItems, m_pImageList, *m_pnStyle, hTheme, nOffsetY, pParent);
+				}
+			}
+			pDC->SelectObject(pnOld);
+
+			break;
+		}
+#endif
+	case CWndDirectUI::styleXPclassic:
+	default:
+		{
+			CPen*   pnOld;
+			CFont*  fnOld;
+			CBrush* brOld;
+			
+			CPen   pnBorder;
+			CPen   pnMarker;
+			CBrush brHeader;
+			CBrush brItemArea;
+			COLORREF clBorder   = GetSysColor(COLOR_3DFACE);
+			COLORREF clText     = GetSysColor(COLOR_BTNTEXT);
+			COLORREF clItemArea = GetSysColor(COLOR_WINDOW);
+			pnBorder.CreatePen(PS_SOLID, 1, clBorder);
+			pnMarker.CreatePen(PS_SOLID, 1, clText);
+			brHeader.CreateSolidBrush(clBorder);
+			brItemArea.CreateSolidBrush(clItemArea);
+			
+			// Draw Header
+			LOGFONT lf;
+			CFont::FromHandle((HFONT) GetStockObject(ANSI_VAR_FONT))->GetLogFont(&lf);
+			CFont fnHeader;
+			lf.lfWeight = FW_BOLD;
+			fnHeader.CreateFontIndirect(&lf);
+			fnOld= pDC->SelectObject(&fnHeader);
+			
+			// Draw Header
+			CRect rcHeader;
+			CRect rcHeaderTextArea;
+			rcHeader.SetRect(rcItem.left, rcItem.top, rcItem.right, rcItem.top + GetSystemMetrics(SM_CYCAPTION)); // Whole top area
+			pDC->SetTextColor(clText);
+			pDC->SetBkColor(clBorder);
+			rcHeaderTextArea.SetRect(rcHeader.left+nHeaderRadius, rcHeader.top, rcHeader.right-nHeaderRadius, rcHeader.bottom); // area between
+			brOld = pDC->SelectObject(&brHeader);
+			pDC->FillSolidRect(rcHeader, clBorder);
+			pDC->DrawText(m_strName, rcHeaderTextArea, DT_LEFT|DT_SINGLELINE|DT_VCENTER|DT_END_ELLIPSIS);
+			
+			// Draw the Expand/Collapse button
+			const int nBtnSpace = 2;
+			int nBtnSize;
+			nBtnSize = GetSystemMetrics(SM_CYCAPTION)-nBtnSpace-nBtnSpace;
+			m_rcExpandCollapseBtn.SetRect(rcItem.right-nHeaderRadius-nBtnSize, rcItem.top +nBtnSpace, rcItem.right-nHeaderRadius, rcItem.top+nBtnSpace+nBtnSize);
+			if (m_uiItemState & ODS_SELECTED) pDC->Draw3dRect(m_rcExpandCollapseBtn, GetSysColor(COLOR_3DHILIGHT), GetSysColor(COLOR_3DSHADOW));
+			pnOld = pDC->SelectObject(&pnMarker);
+			CPoint ptCenter = m_rcExpandCollapseBtn.CenterPoint();
+			CPoint ptLeft   = ptCenter +CPoint(-4, m_bIsCollapsed ? -4:4);
+			CPoint ptRight  = ptCenter +CPoint( 4, m_bIsCollapsed ? -4:4);
+			pDC->MoveTo(ptCenter);
+			pDC->LineTo(ptLeft);
+			pDC->MoveTo(ptCenter);
+			pDC->LineTo(ptRight);
+			ptCenter.Offset(0, m_bIsCollapsed ?3:-3);
+			ptLeft.Offset(0, m_bIsCollapsed ?3:-3);
+			ptRight.Offset(0, m_bIsCollapsed ?3:-3);
+			pDC->MoveTo(ptCenter);
+			pDC->LineTo(ptLeft);
+			pDC->MoveTo(ptCenter);
+			pDC->LineTo(ptRight);
+			m_rcExpandCollapseBtn.left = rcHeader.left;
+			
+			// Now draw the lighter area for all items
+			pDC->SelectObject(&pnBorder);
+			pDC->SelectObject(&brItemArea);
+			pDC->Rectangle(rcItem.left, rcHeaderTextArea.bottom-1, rcItem.right, rcItem.bottom);
+			
+			// Draw Items
+			pDC->SelectObject(&pnMarker);
+			if (!m_bIsCollapsed)
+			{
+				CRect rcItems;
+				rcItems.SetRect(rcItem.left+1, rcHeaderTextArea.bottom, rcItem.right-1, rcHeaderTextArea.bottom);
+				if (m_pImageList) m_pImageList->SetBkColor(clItemArea);
+				for (POSITION pos = m_lstItems.GetHeadPosition(); pos;)
+				{
+					rcItems.top     = rcItems.bottom;
+					rcItems.bottom  = rcItems.top + m_lstItems.GetAt(pos)->GetItemHeight(pDC, *m_pnStyle, NULL);
+					m_lstItems.GetNext(pos)->OnDraw(pDC, rcItems, m_pImageList, *m_pnStyle, NULL, nOffsetY, pParent);
+				}
+			}
 			pDC->SelectObject(fnOld);
 			pDC->SelectObject(pnOld);
 			pDC->SelectObject(brOld);
@@ -529,30 +529,50 @@ void CDirectUIItem::OnDraw(CDC* pDC, CRect rcItem, CImageList* pImageList, int n
 
 	switch (nStyle)
 	{
-	case CWndDirectUI::styleOffice:
+	case CWndDirectUI::styleXP:
 		{
 			CGdiObject*  fnOld;
+			
+			rcItem.left  += nBorderX;
+			rcItem.right -= nBorderX;
+			
+			// When there's an icon place the text more to the right
+			if (m_nIconIndex != -1)
+				rcItem.left += nIconSize+nBorderIconX;
 
 			m_rcItem = rcItem;
-
-			rcItem.left += nIconSize+nBorderIconX;
+			
+			// Item selected? Then draw it brighter
+			if (m_uiItemState & ODS_SELECTED)
+				pDC->SetTextColor(GetSysColor(COLOR_HIGHLIGHT));
+			else
+				pDC->SetTextColor(CDirectUIGroup::MakeXPColor(GetSysColor(COLOR_HIGHLIGHT), 0.15));
+			if (m_uiItemState & ODS_DISABLED) pDC->SetTextColor(GetSysColor(COLOR_GRAYTEXT));
+			
 			fnOld = pDC->SelectStockObject(ANSI_VAR_FONT);
-			pDC->SetTextColor((m_uiItemState & ODS_DISABLED) ? GetSysColor(COLOR_GRAYTEXT) : CDirectUIGroup::MakeXPColor(GetSysColor(COLOR_HIGHLIGHT), 0.15));
+			pDC->SetBkMode(TRANSPARENT);
 			pDC->DrawText(m_strName, rcItem, DT_LEFT|DT_SINGLELINE|DT_VCENTER|DT_END_ELLIPSIS);
 			pDC->DrawText(m_strName, m_rcItem, DT_LEFT|DT_SINGLELINE|DT_VCENTER|DT_END_ELLIPSIS|DT_CALCRECT);
-			m_rcItem.OffsetRect(nIconSize+nBorderIconX, 0);
-
-			if ((m_nIconIndex != -1) && (pImageList))
-				pImageList->Draw(pDC, m_nIconIndex, CPoint(m_rcItem.left-nIconSize-nBorderIconX, rcItem.top+((rcItem.Height()-nIconSize)/2)), ILD_NORMAL);
-
-			if ((m_uiItemState & ODS_SELECTED) & !(m_uiItemState & ODS_DISABLED))
+			
+			// Item selected? Then underline it (doing it this way I don't need to create an underlined font)
+			if (m_uiItemState & ODS_SELECTED)
 			{
 				pDC->MoveTo(m_rcItem.left, m_rcItem.bottom);
 				pDC->LineTo(m_rcItem.right, m_rcItem.bottom);
 			}
-
+			
+			if ((m_nIconIndex != -1) && (pImageList))
+			{
+				// Finally draw the icon
+				m_rcItem.left -= (nBorderIconX+nIconSize);
+				if (m_uiItemState & ODS_SELECTED)
+					pImageList->Draw(pDC, m_nIconIndex, CPoint(m_rcItem.left, rcItem.top+((rcItem.Height()-nIconSize)/2)), ILD_SELECTED);
+				else
+					pImageList->Draw(pDC, m_nIconIndex, CPoint(m_rcItem.left, rcItem.top+((rcItem.Height()-nIconSize)/2)), ILD_NORMAL);
+			}
+			
 			pDC->SelectObject(fnOld);
-		} 
+		}
 		break;
 #ifdef USE_THEMES
 	case CWndDirectUI::styleThemed:
@@ -608,51 +628,62 @@ void CDirectUIItem::OnDraw(CDC* pDC, CRect rcItem, CImageList* pImageList, int n
 			break;
 		}
 #endif
-	case CWndDirectUI::styleXP:
-	default:
+	case CWndDirectUI::styleOffice:
 		{
 			CGdiObject*  fnOld;
-
-			rcItem.left  += nBorderX;
-			rcItem.right -= nBorderX;
-
-			// When there's an icon place the text more to the right
-			if (m_nIconIndex != -1)
-				rcItem.left += nIconSize+nBorderIconX;
 			
 			m_rcItem = rcItem;
-
-			// Item selected? Then draw it brighter
-			if (m_uiItemState & ODS_SELECTED)
-				pDC->SetTextColor(GetSysColor(COLOR_HIGHLIGHT));
-			else
-				pDC->SetTextColor(CDirectUIGroup::MakeXPColor(GetSysColor(COLOR_HIGHLIGHT), 0.15));
-			if (m_uiItemState & ODS_DISABLED) pDC->SetTextColor(GetSysColor(COLOR_GRAYTEXT));
-
+			
+			rcItem.left += nIconSize+nBorderIconX;
 			fnOld = pDC->SelectStockObject(ANSI_VAR_FONT);
+			pDC->SetTextColor((m_uiItemState & ODS_DISABLED) ? GetSysColor(COLOR_GRAYTEXT) : CDirectUIGroup::MakeXPColor(GetSysColor(COLOR_HIGHLIGHT), 0.15));
 			pDC->SetBkMode(TRANSPARENT);
 			pDC->DrawText(m_strName, rcItem, DT_LEFT|DT_SINGLELINE|DT_VCENTER|DT_END_ELLIPSIS);
 			pDC->DrawText(m_strName, m_rcItem, DT_LEFT|DT_SINGLELINE|DT_VCENTER|DT_END_ELLIPSIS|DT_CALCRECT);
-
-			// Item selected? Then underline it (doing it this way I don't need to create an underlined font)
-			if (m_uiItemState & ODS_SELECTED)
+			m_rcItem.OffsetRect(nIconSize+nBorderIconX, 0);
+			
+			if ((m_nIconIndex != -1) && (pImageList))
+				pImageList->Draw(pDC, m_nIconIndex, CPoint(m_rcItem.left-nIconSize-nBorderIconX, rcItem.top+((rcItem.Height()-nIconSize)/2)), ILD_NORMAL);
+			
+			if ((m_uiItemState & ODS_SELECTED) & !(m_uiItemState & ODS_DISABLED))
 			{
 				pDC->MoveTo(m_rcItem.left, m_rcItem.bottom);
 				pDC->LineTo(m_rcItem.right, m_rcItem.bottom);
 			}
-
-			if ((m_nIconIndex != -1) && (pImageList))
-			{
-				// Finally draw the icon
-				m_rcItem.left -= (nBorderIconX+nIconSize);
-				if (m_uiItemState & ODS_SELECTED)
-					pImageList->Draw(pDC, m_nIconIndex, CPoint(m_rcItem.left, rcItem.top+((rcItem.Height()-nIconSize)/2)), ILD_SELECTED);
-				else
-					pImageList->Draw(pDC, m_nIconIndex, CPoint(m_rcItem.left, rcItem.top+((rcItem.Height()-nIconSize)/2)), ILD_NORMAL);
-			}
-
+			
 			pDC->SelectObject(fnOld);
 		}
+		break;
+	case CWndDirectUI::styleXPclassic:
+	default:
+		{
+			CGdiObject*  fnOld;
+			
+			
+			rcItem.left  += nBorderX;
+			rcItem.right -= nBorderX;
+			if (m_nIconIndex != -1)
+				rcItem.left += nIconSize+nBorderIconX;
+
+			m_rcItem = rcItem;
+			fnOld = pDC->SelectStockObject(ANSI_VAR_FONT);
+			pDC->SetTextColor((m_uiItemState & ODS_DISABLED) ? GetSysColor(COLOR_GRAYTEXT) : CDirectUIGroup::MakeXPColor(GetSysColor(COLOR_HIGHLIGHT), 0.15));
+			pDC->SetBkMode(TRANSPARENT);
+			pDC->DrawText(m_strName, rcItem, DT_LEFT|DT_SINGLELINE|DT_VCENTER|DT_END_ELLIPSIS);
+			pDC->DrawText(m_strName, m_rcItem, DT_LEFT|DT_SINGLELINE|DT_VCENTER|DT_END_ELLIPSIS|DT_CALCRECT);
+			//m_rcItem.OffsetRect(nIconSize+nBorderIconX, 0);
+			
+			if ((m_nIconIndex != -1) && (pImageList))
+				pImageList->Draw(pDC, m_nIconIndex, CPoint(m_rcItem.left-nIconSize-nBorderIconX, rcItem.top+((rcItem.Height()-nIconSize)/2)), ILD_NORMAL);
+			
+			if ((m_uiItemState & ODS_SELECTED) & !(m_uiItemState & ODS_DISABLED))
+			{
+				pDC->MoveTo(m_rcItem.left, m_rcItem.bottom);
+				pDC->LineTo(m_rcItem.right, m_rcItem.bottom);
+			}
+			
+			pDC->SelectObject(fnOld);
+		} 
 	}
 }
 
@@ -793,9 +824,8 @@ void CWndDirectUI::OnPaint()
 
 	switch (m_nStyle)
 	{
-	case styleXPclassic:
-	case styleOffice:
-		MemDC.FillSolidRect(rc, GetSysColor(COLOR_WINDOW));
+	case styleXP:
+		MemDC.FillSolidRect(rc, CDirectUIGroup::MakeXPColor(GetSysColor(COLOR_HIGHLIGHT), 0.4));
 		break;
 #ifdef USE_THEMES
 	case styleThemed:
@@ -806,9 +836,10 @@ void CWndDirectUI::OnPaint()
 			break;
 		}
 #endif
-	case styleXP:
+	case styleXPclassic:
+	case styleOffice:
 	default:
-		MemDC.FillSolidRect(rc, CDirectUIGroup::MakeXPColor(GetSysColor(COLOR_HIGHLIGHT), 0.4));
+		MemDC.FillSolidRect(rc, GetSysColor(COLOR_WINDOW));
 	}
 
 	rcItem.SetRect(nSpaceX, 0, rc.right - nSpaceX, 0);
@@ -1282,20 +1313,24 @@ void CDirectUIItemStatic::OnDraw(CDC* pDC, CRect rcItem, CImageList* pImageList,
 
 	switch (nStyle)
 	{
-	case CWndDirectUI::styleOffice:
+	case CWndDirectUI::styleXP:
 		{
 			CGdiObject*  fnOld;
-
+			
+			rcItem.left  += nBorderX;
+			rcItem.right -= nBorderX;
+			
 			m_rcItem = rcItem;
-
+			
+			pDC->SetTextColor(GetSysColor(COLOR_HIGHLIGHT));
+			
 			fnOld = pDC->SelectStockObject(ANSI_VAR_FONT);
-			pDC->SetTextColor((m_uiItemState & ODS_DISABLED) ? GetSysColor(COLOR_GRAYTEXT) : CDirectUIGroup::MakeXPColor(GetSysColor(COLOR_HIGHLIGHT), 0.15));
+			pDC->SetBkMode(TRANSPARENT);
 			pDC->DrawText(m_strName, rcItem, DT_LEFT|DT_END_ELLIPSIS);
 			pDC->DrawText(m_strName, m_rcItem, DT_LEFT|DT_END_ELLIPSIS|DT_CALCRECT);
-			m_rcItem.OffsetRect(nIconSize+nBorderIconX, 0);
-
+			
 			pDC->SelectObject(fnOld);
-		} 
+		}
 		break;
 #ifdef USE_THEMES
 	case CWndDirectUI::styleThemed:
@@ -1320,25 +1355,22 @@ void CDirectUIItemStatic::OnDraw(CDC* pDC, CRect rcItem, CImageList* pImageList,
 			break;
 		}
 #endif
-	case CWndDirectUI::styleXP:
+	case CWndDirectUI::styleOffice:
+	case CWndDirectUI::styleXPclassic:
 	default:
 		{
 			CGdiObject*  fnOld;
-
-			rcItem.left  += nBorderX;
-			rcItem.right -= nBorderX;
-
+			
 			m_rcItem = rcItem;
-
-			pDC->SetTextColor(GetSysColor(COLOR_HIGHLIGHT));
-
+			
 			fnOld = pDC->SelectStockObject(ANSI_VAR_FONT);
-			pDC->SetBkMode(TRANSPARENT);
+			pDC->SetTextColor((m_uiItemState & ODS_DISABLED) ? GetSysColor(COLOR_GRAYTEXT) : CDirectUIGroup::MakeXPColor(GetSysColor(COLOR_HIGHLIGHT), 0.15));
 			pDC->DrawText(m_strName, rcItem, DT_LEFT|DT_END_ELLIPSIS);
 			pDC->DrawText(m_strName, m_rcItem, DT_LEFT|DT_END_ELLIPSIS|DT_CALCRECT);
-
+			m_rcItem.OffsetRect(nIconSize+nBorderIconX, 0);
+			
 			pDC->SelectObject(fnOld);
-		}
+		} 
 	}
 }
 
@@ -1400,18 +1432,19 @@ void    CDirectUIItemEdit::OnDraw(CDC* pDC, CRect rcItem, CImageList* pImageList
 
 	switch (nStyle)
 	{
-	case CWndDirectUI::styleOffice:
+	case CWndDirectUI::styleXP:
 		{
-			pDC->Draw3dRect(m_rcItem, GetSysColor(COLOR_WINDOWFRAME), GetSysColor(COLOR_WINDOWFRAME));
-			m_rcItem.DeflateRect(1, 1, 1, 1);
-			pDC->FillSolidRect(m_rcItem, GetSysColor(COLOR_WINDOW));
-			m_rcItem.DeflateRect(1, 1, 1, 1);
-			pDC->SetTextColor(GetSysColor(COLOR_WINDOWTEXT));
+			pDC->Draw3dRect(rcItem, GetSysColor(COLOR_3DSHADOW), GetSysColor(COLOR_3DHILIGHT));
+			rcItem.DeflateRect(1, 1, 1, 1);
+			pDC->FillSolidRect(rcItem, CDirectUIGroup::MakeXPColor(GetSysColor(COLOR_3DFACE), 0.5));
+			rcItem.DeflateRect(1, 1, 1, 1);
+			pDC->SetTextColor(GetSysColor(COLOR_BTNTEXT));
 			CGdiObject* fnOld = pDC->SelectStockObject(ANSI_VAR_FONT);
 			pDC->SetBkMode(TRANSPARENT);
-			pDC->DrawText(m_strName, m_rcItem, DT_LEFT|DT_SINGLELINE);
+			pDC->DrawText(m_strName, rcItem, DT_LEFT|DT_SINGLELINE);
 			pDC->SelectObject(fnOld);
-		} 
+			rcItem.InflateRect(2, 2, 2, 2);
+		}
 		break;
 #ifdef USE_THEMES
 	case CWndDirectUI::styleThemed:
@@ -1439,20 +1472,21 @@ void    CDirectUIItemEdit::OnDraw(CDC* pDC, CRect rcItem, CImageList* pImageList
 			}
 		}
 #endif
-	case CWndDirectUI::styleXP:
+	case CWndDirectUI::styleOffice:
+	case CWndDirectUI::styleXPclassic:
 	default:
 		{
-			pDC->Draw3dRect(rcItem, GetSysColor(COLOR_3DSHADOW), GetSysColor(COLOR_3DHILIGHT));
-			rcItem.DeflateRect(1, 1, 1, 1);
-			pDC->FillSolidRect(rcItem, CDirectUIGroup::MakeXPColor(GetSysColor(COLOR_3DFACE), 0.5));
-			rcItem.DeflateRect(1, 1, 1, 1);
-			pDC->SetTextColor(GetSysColor(COLOR_BTNTEXT));
+			pDC->Draw3dRect(m_rcItem, GetSysColor(COLOR_WINDOWFRAME), GetSysColor(COLOR_WINDOWFRAME));
+			m_rcItem.DeflateRect(1, 1, 1, 1);
+			pDC->FillSolidRect(m_rcItem, GetSysColor(COLOR_WINDOW));
+			m_rcItem.DeflateRect(1, 1, 1, 1);
+			pDC->SetTextColor(GetSysColor(COLOR_WINDOWTEXT));
 			CGdiObject* fnOld = pDC->SelectStockObject(ANSI_VAR_FONT);
 			pDC->SetBkMode(TRANSPARENT);
-			pDC->DrawText(m_strName, rcItem, DT_LEFT|DT_SINGLELINE);
+			pDC->DrawText(m_strName, m_rcItem, DT_LEFT|DT_SINGLELINE);
 			pDC->SelectObject(fnOld);
-			rcItem.InflateRect(2, 2, 2, 2);
-		}
+		} 
+		break;
 	}
 	m_rcItem = rcItem;
 }
