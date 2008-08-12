@@ -1,0 +1,6 @@
+; v7ui.def : Declares the module parameters for the DLL.
+
+LIBRARY      "v7ui"
+DESCRIPTION  'v7ui Windows Dynamic Link Library'
+
+EXPORTS
