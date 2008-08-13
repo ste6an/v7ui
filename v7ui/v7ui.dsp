@@ -25,7 +25,7 @@ CFG=v7ui - Win32 Debug
 # PROP AllowPerConfigDependencies 0
 # PROP Scc_ProjName ""
 # PROP Scc_LocalPath ""
-CPP=xicl6.exe
+CPP=cl.exe
 MTL=midl.exe
 RSC=rc.exe
 
@@ -51,7 +51,7 @@ RSC=rc.exe
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
-LINK32=xilink6.exe
+LINK32=link.exe
 # ADD BASE LINK32 /nologo /subsystem:windows /dll /machine:I386
 # ADD LINK32 /nologo /subsystem:windows /dll /machine:I386
 
@@ -69,7 +69,7 @@ LINK32=xilink6.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_WINDLL" /D "_AFXDLL" /YX /FD /GZ /c
-# ADD CPP /nologo /MD /W3 /Gm /GR /GX /ZI /Od /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_WINDLL" /D "_AFXDLL" /YX /FD /GZ /c
+# ADD CPP /nologo /MD /W2 /Gm /Gi /GR /GX /ZI /Od /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_WINDLL" /D "_AFXDLL" /YX /FD /GZ /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x419 /d "_DEBUG" /d "_AFXDLL"
@@ -77,7 +77,7 @@ LINK32=xilink6.exe
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
-LINK32=xilink6.exe
+LINK32=link.exe
 # ADD BASE LINK32 /nologo /subsystem:windows /dll /debug /machine:I386 /pdbtype:sept
 # ADD LINK32 /nologo /subsystem:windows /dll /debug /machine:I386 /pdbtype:sept
 
@@ -93,6 +93,10 @@ LINK32=xilink6.exe
 # Begin Source File
 
 SOURCE=.\ControlBarContext.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\ExpBarContext.cpp
 # End Source File
 # Begin Source File
 
@@ -189,6 +193,10 @@ SOURCE=.\WndDirectUI.h
 # Begin Source File
 
 SOURCE=.\res\hand.cur
+# End Source File
+# Begin Source File
+
+SOURCE=.\res\toolbar1.bmp
 # End Source File
 # Begin Source File
 

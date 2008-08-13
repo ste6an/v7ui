@@ -25,7 +25,7 @@ class CDirectUIItem: public CObject
 {
 public:
 	virtual HCURSOR GetCursor() {return m_hCursorHand;};
-	virtual BOOL MouseItemLUp(CPoint point, CPoint ptOffset);
+	virtual BOOL MouseItemLUp(CPoint point, CPoint ptOffset, CWnd* pParent);
 	virtual BOOL MouseItemLDown(CPoint point, CPoint ptOffset);
 	virtual BOOL MouseItemOut(CPoint point, CPoint ptOffset);
 	virtual BOOL MouseItemIn(CPoint point, CPoint ptOffset);
@@ -134,12 +134,17 @@ protected:
 /////////////////////////////////////////////////////////////////////////////
 // Fenster CWndDirectUI 
 
-class CWndDirectUI : public CWnd
-{ 
-// Konstruktion
-public:
-	CWndDirectUI();
+class CExpBarContext;
+class CWndDirectUI;
 
+class CWndDirectUI : public CWnd
+{
+	friend class CExpBarContext;
+public:
+
+	// Konstruktion
+	CWndDirectUI();
+	CWndDirectUI(CExpBarContext* cont, CBLContext* pUDC);
 	enum Styles {
 		styleXP        =       0x01,
 		styleOffice    =       0x02,
@@ -205,6 +210,38 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 	CTypedPtrList<CObList, CDirectUIGroup*> m_lstGroups;
+protected:
+	CExpBarContext* m_pEBContext;
+	CBLContext* m_pHiContext;
+};
+
+class CExpBarContext : public CContextImpl<CExpBarContext>, public CV7Control, public CV7ControlEx
+{
+	//friend class CWndDirectUI;
+public:
+	CExpBarContext();
+	virtual ~CExpBarContext();
+	
+    //CV7ControlEx
+    virtual BOOL InitControlEx(CBLContext* pForm, CGetDoc7* pDoc, CGetField* pField, CBLContext* pUDC, CValue* pCreateParam);
+    virtual BOOL CreateControlWndEx(CWnd* pParent);
+	
+    //CV7Control
+    virtual BOOL CreateControlWnd(CWnd* pParent, CGetDoc7* pDoc, CGetField* pGetField, CBLContext* pUDC);
+	
+	BL_BEGIN_CONTEXT("ExplorerBar", "ExplorerBar");
+	BL_FUNC(AddGroup,"AddGroup",1)
+	{
+		m_pExpBar->AddGroup(ppParams[0]->GetString());
+			return TRUE;
+	}
+	BL_END_CONTEXT();
+protected:
+	CWndDirectUI* m_pExpBar;
+	CGetDoc7* m_pDoc;
+	CGetField* m_pField;
+	CBLContext* m_pUDC;
+	CCtrlEventManager m_EventManager;
 };
 
 /////////////////////////////////////////////////////////////////////////////

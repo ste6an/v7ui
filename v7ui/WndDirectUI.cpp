@@ -721,9 +721,9 @@ BOOL CDirectUIItem::MouseItemLDown(CPoint point, CPoint ptOffset)
 	return FALSE;
 }
 
-BOOL CDirectUIItem::MouseItemLUp(CPoint point, CPoint ptOffset)
+BOOL CDirectUIItem::MouseItemLUp(CPoint point, CPoint ptOffset, CWnd* pParent)
 {
-	//AfxGetMainWnd()->PostMessage(WM_COMMAND, m_uiCommand, 0);
+	pParent->PostMessage(WM_COMMAND, m_uiCommand, 0);
 	return FALSE;
 }
 
@@ -735,7 +735,7 @@ BOOL CDirectUIItem::MouseItemLUp(CPoint point, CPoint ptOffset)
 BEGIN_MESSAGE_MAP(CWndDirectUI, CWnd)
 	//{{AFX_MSG_MAP(CWndDirectUI)
 	ON_WM_PAINT()
-	ON_WM_ERASEBKGND()
+//	ON_WM_ERASEBKGND()
 	ON_WM_SETCURSOR()
 	ON_WM_LBUTTONDOWN()
 	ON_WM_MOUSEMOVE()
@@ -760,6 +760,19 @@ CWndDirectUI::CWndDirectUI()
 	m_nStyle        = styleThemed;
 	m_lstImages.Create(1, 1, ILC_COLOR,1, 1);
 	RegisterWindowClass();
+}
+
+CWndDirectUI::CWndDirectUI(CExpBarContext* cont, CBLContext* pUDC) :
+m_pEBContext(cont),CWnd()
+{
+	m_pLastHitItem  = NULL;
+	m_pLastHitGroup = NULL;
+	m_hHand         = AfxGetApp()->LoadCursor(IDC_MYHAND);
+	VERIFY(m_hHand);  // If asserts, add this cursor to your resource
+	m_nStyle        = styleThemed;
+	m_lstImages.Create(1, 1, ILC_COLOR,1, 1);
+	RegisterWindowClass();
+	m_pHiContext = pUDC ? pUDC : cont;
 }
 
 CWndDirectUI::~CWndDirectUI() 
@@ -1071,8 +1084,7 @@ void CWndDirectUI::OnLButtonUp(UINT nFlags, CPoint point)
 {
 	if (m_pLastHitItem)
 	{
-		if (m_pLastHitItem->MouseItemLUp(point, CPoint(GetOffsetX(), GetOffsetY()))) InvalidateIfPossible();
-		//GetParent()->PostMessage(WM_COMMAND, m_pLastHitItem->m_uiCommand, 0);
+		if (m_pLastHitItem->MouseItemLUp(point, CPoint(GetOffsetX(), GetOffsetY()),GetParent())) InvalidateIfPossible();
 	}
 	//CWnd::OnLButtonUp(nFlags, point);
 }

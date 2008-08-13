@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include <afxdllx.h>
+#include <CommCtrl.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -27,6 +28,12 @@ DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved)
 
 		context_obj::CContextBase::InitAllContextClasses();
 		Init1CGlobal(hInstance);
+// 		INITCOMMONCONTROLSEX InitCtrlEx;
+// 		InitCtrlEx.dwSize = sizeof(INITCOMMONCONTROLSEX);
+// 		InitCtrlEx.dwICC  = ICC_PROGRESS_CLASS|ICC_LISTVIEW_CLASSES|ICC_BAR_CLASSES|
+// 			ICC_COOL_CLASSES|ICC_TAB_CLASSES;
+// 		InitCommonControlsEx(&InitCtrlEx);
+
 		new CDynLinkLibrary(V7uiDLL);
 	}
 	else if (dwReason == DLL_PROCESS_DETACH)

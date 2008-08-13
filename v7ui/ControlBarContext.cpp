@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "ControlBarContext.h"
-#include "resource.h"
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -50,7 +49,6 @@ CControlBarContext::CControlBarContext()
 
 CControlBarContext::~CControlBarContext()
 {
-//	m_pCBar->DestroyWindow();
 	delete m_pCBar;
 }
 
@@ -81,14 +79,14 @@ BOOL CControlBarContext::CreateControl(CValue& rValue, CValue** ppValues)
 
 BOOL CControlBarContext::CreateExplorerBar(CValue& rValue, CValue** ppValues)
 {
-	CWndDirectUI* pW = new CWndDirectUI();
-	//pW->SetStyle(CWndDirectUI::styleXP);
-	pW->Create(CRect(0,0,300,0), m_pCBar, 1000);
-	pW->InitFromMenu(151);
-	int nGroup=pW->AddGroup("√руппа1");
-	pW->AddItem(nGroup, new CDirectUIItemStatic(_T("—сылка1")));
-	m_pCBar->m_pChild = pW;
-	return TRUE;
+// 	CWndDirectUI* pW = new CWndDirectUI();
+// 	//pW->SetStyle(CWndDirectUI::styleXP);
+// 	pW->Create(CRect(0,0,300,0), m_pCBar, 0);
+// 	pW->InitFromMenu(151);
+// 	pW->SetToolbarImages(IDR_TOOLBAR1);
+// 	int nGroup=pW->AddGroup("√руппа1");
+// 	pW->AddItem(nGroup, new CDirectUIItem(_T("—сылка1"),-1,1));
+// 	m_pCBar->m_pChild = pW;
 	return TRUE;
 }
 
