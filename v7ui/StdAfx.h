@@ -15,6 +15,8 @@
 #include <afxwin.h>         // MFC core and standard components
 #include <afxext.h>         // MFC extensions
 
+#include <atlbase.h>
+
 #ifndef _AFX_NO_OLE_SUPPORT
 #include <afxole.h>         // MFC OLE classes
 #include <afxodlgs.h>       // MFC OLE dialog classes
@@ -47,4 +49,9 @@
 #include "../_1Common/contextimpl.hpp"
 #include "../_1Common/dev_serv.h"
 #include "../_1Common/types1c.h"
+#include "../_1Common/nocasemap.hpp"
+#include "../_1Common/blptr.h"
+#include "../_1Common/CtrlEvents.h"
 #include "../_1Common/V7Control.h"
+#include "../_1Common/BLColl/istrmap.h"
+#include "../_1Common/BLColl/BLCollection.h"

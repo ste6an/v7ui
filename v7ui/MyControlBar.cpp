@@ -38,7 +38,7 @@ int CMyControlBar::Create( CWnd* pWnd, const char* cCaption )
 
 void CMyControlBar::OnSize( UINT nType, int cx, int cy )
 {
-	DoMsgLine("size");
+	//DoMsgLine("size");
 }
 
 void CMyControlBar::OnBarDock()
@@ -101,6 +101,6 @@ int CMyControlBar::CreateControl( LPCTSTR className )
 
 BOOL CMyControlBar::OnCmdMsg(UINT nID, int nCode, void* pExtra, AFX_CMDHANDLERINFO* pHandlerInfo) 
 {
-	DoMsgLine("nID: %d\t nCode: %d",mmNone,nID,nCode);
+	//DoMsgLine("nID: %d\t nCode: %d",mmNone,nID,nCode);
 	return TRUE;
 }

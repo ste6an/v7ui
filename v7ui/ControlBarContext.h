@@ -10,10 +10,10 @@
 #endif // _MSC_VER > 1000
 
 #include "MyControlBar.h"
-#include "WndDirectUI.h"
 
 class CControlBarContext : public CContextImpl<CControlBarContext>  
 {
+	friend class CWndDirectUI;
 public:
 	CControlBarContext();
 	virtual ~CControlBarContext();

@@ -10,8 +10,6 @@
 #endif // _MSC_VER > 1000
 
 #include "LayoutManager.h"
-#include "MyControlBar.h"
-#include "resource.h"
 
 class CLayoutMgrContext : public CContextImpl<CLayoutMgrContext> 
 {
@@ -29,33 +27,6 @@ public:
 	{
 		*pValue=0L;
 		return TRUE;
-	}
-	BL_PROC(Test,"Тест",1)
-	{
- 		CMyControlBar* pCB = new CMyControlBar();
- 		pCB->m_bAutoDelete=TRUE;
- 		pCB->Create(pMainFrame,"фигня");
- 		pCB->EnableDocking(CBRS_ALIGN_ANY);
- 		pMainFrame->FloatControlBar(pCB,CPoint(10,10),0);
-
-// 		CBLContext* pFrmContext = ppParams[0]->GetContext();
-// 		if (strcmp(pFrmContext->GetRuntimeClass()->m_lpszClassName,"CFormAllCtrlsContext"))
-// 			RuntimeError("Недопустимое значение параметра");
-// 		
-// 		CGetDoc7* pDoc = ((CFormAllCtrlsContext*)pFrmContext)->m_GetDoc;
-// 		CDockableWindow* pW = new CDockableWindow(0,0,pDoc);
-// 		pW->Create(pMainFrame, "ууу",WS_VISIBLE|CBRS_ALL ,1,7777,NULL);
-		return TRUE;
-	}
-	BL_PROC(DockForm,"Пристыковать",0)
-	{
-/*		CDialogBar* pDW = new CDialogBar();
-		pDW->m_bAutoDelete=TRUE;
-		pDW->Create(pMainFrame,IDD_DIALOG1,CBRS_LEFT|CBRS_TOOLTIPS|CBRS_FLYBY,IDD_DIALOG1);
-		pDW->EnableDocking(CBRS_ALIGN_ANY);
-		pMainFrame->DockControlBarEx(pDW, AFX_IDW_DOCKBAR_LEFT, 0, 0, (float)0.75, 100);
-/**/		return TRUE;
-		
 	}
 	BL_END_CONTEXT();
 private:
