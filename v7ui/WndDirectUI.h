@@ -43,6 +43,7 @@ public:
 	CString m_strName;
 	int     m_nIconIndex;
 	UINT    m_uiCommand;
+	CValue	m_ItemValue;
 
 protected:
 	static HCURSOR m_hCursorHand;
@@ -178,7 +179,7 @@ public:
 	BOOL     ChangeGroupName(int nGroup, CString strName);
 	CString& GetGroupName(int nGroup);
 	BOOL     RemoveGroup(int nGroup);
-	int      AddGroup(CString strName);
+	CDirectUIGroup* AddGroup(CString strName);
 	void     RemoveAll();
 	virtual ~CWndDirectUI();
 
@@ -212,7 +213,43 @@ protected:
 	CTypedPtrList<CObList, CDirectUIGroup*> m_lstGroups;
 protected:
 	CExpBarContext* m_pEBContext;
-	CBLContext* m_pHiContext;
+};
+
+class CEBGroupContext : public CContextImpl<CEBGroupContext,no_init_done>
+{
+public:
+	CEBGroupContext();
+	CEBGroupContext(CString sCaption,CWndDirectUI* pExpBar);
+	virtual ~CEBGroupContext();
+
+	BL_BEGIN_CONTEXT("CEBGroupContext","CEBGroupContext");
+	BL_FUNC_WITH_DEFVAL(AddItem,"AddItem",3);
+	BL_DEFVAL_FOR(AddItem)
+	{
+		if(nParam==2)
+		{
+			*pValue=0L;
+			return TRUE;
+		}
+		return FALSE;
+	}
+	BL_END_CONTEXT();
+
+protected:
+	CDirectUIGroup* m_pGroup;
+};
+
+class CEBItemContext : public CContextImpl<CEBItemContext,no_init_done>
+{
+public:
+	CEBItemContext();
+	CEBItemContext(CString sCaption, CDirectUIGroup* pGroup, int nIconIndex, CValue& value);
+	virtual ~CEBItemContext();
+
+	BL_BEGIN_CONTEXT("CEBItemContext","CEBItemContext");
+	BL_END_CONTEXT();
+protected:
+	CDirectUIItem* m_pItem;
 };
 
 class CExpBarContext : public CContextImpl<CExpBarContext>, public CV7Control, public CV7ControlEx
@@ -230,12 +267,11 @@ public:
     virtual BOOL CreateControlWnd(CWnd* pParent, CGetDoc7* pDoc, CGetField* pGetField, CBLContext* pUDC);
 	
 	BL_BEGIN_CONTEXT("ExplorerBar", "ExplorerBar");
-	BL_FUNC(AddGroup,"AddGroup",1)
-	{
-		m_pExpBar->AddGroup(ppParams[0]->GetString());
-			return TRUE;
-	}
+	BL_FUNC(AddGroup,"AddGroup",1);
 	BL_END_CONTEXT();
+
+	void OnItemClick(CDirectUIItem* pItem);
+
 protected:
 	CWndDirectUI* m_pExpBar;
 	CGetDoc7* m_pDoc;

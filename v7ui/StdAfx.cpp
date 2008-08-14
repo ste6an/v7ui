@@ -8,6 +8,7 @@
 #include "../_1Common/1cheaders/1cheaders.inl"
 #include "../_1Common/dev_serv.cpp"
 #include "../_1Common/CtrlEvents.cpp"
+#include "../_1Common/BLColl/istrmap.cpp"
 
 
 

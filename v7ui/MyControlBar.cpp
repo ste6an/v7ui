@@ -19,20 +19,17 @@ CMyControlBar::CMyControlBar()
 {
 	m_bOptimizedRedrawEnabled=TRUE;
 	m_bAutoDelete=FALSE;
-	m_pChild=new CWnd();
-	m_pChild->SetParent(this);
+	m_pChild=NULL;
 }
 
 CMyControlBar::~CMyControlBar()
 {
-	delete m_pChild;
+	if(m_pChild) delete m_pChild;
 }
 
 int CMyControlBar::Create( CWnd* pWnd, const char* cCaption )
 {
-	SECControlBar::Create(pWnd, cCaption,WS_VISIBLE|CBRS_ALL ,1,7777,NULL);
-//	m_pButton=new CButton();
-//	m_pButton->Create("кнопачка",WS_CHILD|WS_VISIBLE,CRect(0,0,100,100),this,0);
+	SECControlBar::Create(pWnd, cCaption,WS_VISIBLE|CBRS_ALL ,1,0,NULL);
 	return 1;
 }
 
@@ -53,19 +50,14 @@ void CMyControlBar::OnBarFloat()
 void CMyControlBar::DoPaint( class CDC * pDC)
 {
  	CRect ir;
- 	GetInsideRect(ir);
- 	CBrush br;
- 	br.CreateSolidBrush(::GetSysColor(COLOR_BTNFACE));
- 	pDC->FillRect(ir,&br);
-  	CRect rect;
-  	GetClientRect(rect);
+	CRect rect;
+	GetInsideRect(ir);
+	GetClientRect(rect);
   	DrawBorders(pDC, rect);
+	CBrush br;
+	br.CreateSolidBrush(::GetSysColor(COLOR_BTNFACE));
+	pDC->FillRect(ir,&br);
 	DrawGripper(pDC, rect);
-	SetGripperExpandButtonState(2);
-	//AdjustInsideRectForGripper(rect,1);
-// 	DrawGripperCloseButton(pDC,rect,1);
-// 	DrawGripperExpandButton(pDC,rect,1);
-
 }
 
 CSize CMyControlBar::CalcDynamicLayout( int nLength, DWORD nMode )
@@ -96,11 +88,12 @@ CSize CMyControlBar::CalcFixedLayout( BOOL bStretch, BOOL bHorz )
 
 int CMyControlBar::CreateControl( LPCTSTR className )
 {
+	if(!m_pChild)
+		m_pChild=new CWnd();
 	return m_pChild->CreateControl(className,NULL, WS_VISIBLE|WS_CHILD,CRect(0,0,0,0), this, 0, NULL,FALSE,NULL);	
 }
 
 BOOL CMyControlBar::OnCmdMsg(UINT nID, int nCode, void* pExtra, AFX_CMDHANDLERINFO* pHandlerInfo) 
 {
-	//DoMsgLine("nID: %d\t nCode: %d",mmNone,nID,nCode);
 	return TRUE;
 }
