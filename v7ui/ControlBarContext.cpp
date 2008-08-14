@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "ControlBarContext.h"
+#include "WndDirectUI.h"
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -42,7 +43,7 @@ BL_INIT_CONTEXT(CControlBarContext);
 CControlBarContext::CControlBarContext()
 {
 	m_pCBar = new CMyControlBar();
-	m_pCBar->Create(pMainFrame,_T("!!!"));
+	m_pCBar->Create(pMainFrame,_T(""));
 	m_pCBar->EnableDocking(CBRS_ALIGN_ANY);
 	pMainFrame->FloatControlBar(m_pCBar, CPoint(100,100),0);
 }
@@ -63,8 +64,10 @@ BOOL CControlBarContext::Dock(CValue** ppParams)
 	case 3:	dockSide=AFX_IDW_DOCKBAR_RIGHT; break;
 	case 4:	dockSide=AFX_IDW_DOCKBAR_FLOAT; break;
 	}
-	//m_pCBar->SetBarStyle(WS_CHILD|WS_VISIBLE|dockSide);
-	pMainFrame->DockControlBarEx(m_pCBar, dockSide, 0, 0, (float)0.75, 100);
+	if (dockSide==AFX_IDW_DOCKBAR_FLOAT)
+		pMainFrame->FloatControlBar(m_pCBar, CPoint(100,100),0);
+	else
+		pMainFrame->DockControlBarEx(m_pCBar, dockSide, 0, 0, (float)0.75, 100);
 	return TRUE;
 }
 
@@ -79,14 +82,11 @@ BOOL CControlBarContext::CreateControl(CValue& rValue, CValue** ppValues)
 
 BOOL CControlBarContext::CreateExplorerBar(CValue& rValue, CValue** ppValues)
 {
-// 	CWndDirectUI* pW = new CWndDirectUI();
-// 	//pW->SetStyle(CWndDirectUI::styleXP);
-// 	pW->Create(CRect(0,0,300,0), m_pCBar, 0);
-// 	pW->InitFromMenu(151);
-// 	pW->SetToolbarImages(IDR_TOOLBAR1);
-// 	int nGroup=pW->AddGroup("√руппа1");
-// 	pW->AddItem(nGroup, new CDirectUIItem(_T("—сылка1"),-1,1));
-// 	m_pCBar->m_pChild = pW;
+	CExpBarContext* pEB=new CExpBarContext();
+	pEB->CreateControlWndEx(m_pCBar);
+	m_pCBar->m_pChild=pEB->m_pExpBar;
+	rValue.AssignContext(pEB);
+	m_pCBar->CalcFixedLayout(TRUE,0);
 	return TRUE;
 }
 
@@ -99,17 +99,21 @@ BOOL CControlBarContext::Get_Visible(CValue& value) const
 BOOL CControlBarContext::Set_Visible(CValue const& value)
 {
 	int v = value.GetNumeric();
-	m_pCBar->ShowWindow(v? SW_SHOW : SW_HIDE);
-	pMainFrame->RecalcLayout(1);
+	pMainFrame->ShowControlBar(m_pCBar,v?TRUE:FALSE,FALSE);
 	return TRUE;
 }
 
 BOOL CControlBarContext::Get_Caption(CValue& value) const
 {
+	value.SetType(CType(2));
+	m_pCBar->GetWindowText(value.m_String);
 	return TRUE;
 }
 
 BOOL CControlBarContext::Set_Caption(CValue const& value)
 {
+	m_pCBar->SetWindowText(value.GetString());
+	pMainFrame->ForceCaptionRedraw();
+	pMainFrame->RedrawWindow();
 	return TRUE;
 }
