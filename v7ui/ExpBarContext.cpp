@@ -95,3 +95,9 @@ void CExpBarContext::OnItemClick( CDirectUIItem* pItem )
 		m_EventManager.Invoke1(ebOnItemClick, val);
 	}
 }
+
+BOOL CExpBarContext::SetStyle(CValue** ppParams)
+{
+	m_pExpBar->SetStyle(ppParams[0]->GetNumeric());
+	return TRUE;
+}
