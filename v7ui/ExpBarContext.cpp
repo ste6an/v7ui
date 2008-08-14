@@ -30,7 +30,10 @@ BL_INIT_CONTEXT(CExpBarContext);
 
 CExpBarContext::CExpBarContext()
 {
-
+	m_pDoc=NULL;
+	m_pExpBar=NULL;
+	m_pField=NULL;
+	m_pUDC=NULL;
 }
 
 CExpBarContext::~CExpBarContext()
@@ -48,25 +51,40 @@ BOOL CExpBarContext::InitControlEx(CBLContext* pForm, CGetDoc7* pDoc, CGetField*
 
 BOOL CExpBarContext::CreateControlWndEx(CWnd* pParent)
 {
-	CControlID* pControlID = m_pField->GetCtrlInfo();
-    CWnd* pControlWnd = m_pDoc->GetFieldWnd(m_pField);
-    CRect rect;
-    pControlWnd->GetWindowRect(&rect);
-    pParent->ScreenToClient(rect);
-	
-	BOOL bSuccess = FALSE;
-	m_pExpBar = new CWndDirectUI(this,m_pUDC);
-	if(m_pExpBar)
+	if (!m_pDoc)
 	{
-		bSuccess=m_pExpBar->Create(rect, pParent, m_pField->GetCtrlID());
-		if (bSuccess)
+		BOOL bSuccess = FALSE;
+		m_pExpBar = new CWndDirectUI(this,m_pUDC);
+		if(m_pExpBar)
 		{
-			pControlWnd->DestroyWindow();
-			m_EventManager.SetEvents(CEBCtrlEvents, ebLastEvent, pControlID, m_pDoc->m_pBLModule, this, m_pUDC);
+			bSuccess=m_pExpBar->Create(CRect(0,0,50,100), pParent, 0);
+			if (bSuccess)
+			{
+				m_EventManager.SetEvents(CEBCtrlEvents, ebLastEvent, "", CBLModule::GetExecutedModule(), this, m_pUDC);
+			}
 		}
+		return bSuccess;
+	}else{
+		CControlID* pControlID = m_pField->GetCtrlInfo();
+		CWnd* pControlWnd = m_pDoc->GetFieldWnd(m_pField);
+		CRect rect;
+		pControlWnd->GetWindowRect(&rect);
+		pParent->ScreenToClient(rect);
+		
+		BOOL bSuccess = FALSE;
+		m_pExpBar = new CWndDirectUI(this,m_pUDC);
+		if(m_pExpBar)
+		{
+			bSuccess=m_pExpBar->Create(rect, pParent, m_pField->GetCtrlID());
+			if (bSuccess)
+			{
+				pControlWnd->DestroyWindow();
+				m_EventManager.SetEvents(CEBCtrlEvents, ebLastEvent, pControlID, m_pDoc->m_pBLModule, this, m_pUDC);
+			}
+		}
+		
+		return bSuccess;
 	}
-	
-	return bSuccess;
 }
 
 BOOL CExpBarContext::CreateControlWnd(CWnd* pParent, CGetDoc7* pDoc, CGetField* pGetField, CBLContext* pUDC)

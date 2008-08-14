@@ -254,7 +254,7 @@ protected:
 
 class CExpBarContext : public CContextImpl<CExpBarContext>, public CV7Control, public CV7ControlEx
 {
-	//friend class CWndDirectUI;
+	friend class CControlBarContext;
 public:
 	CExpBarContext();
 	virtual ~CExpBarContext();
