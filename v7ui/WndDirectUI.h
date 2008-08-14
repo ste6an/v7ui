@@ -33,7 +33,7 @@ public:
 	virtual BOOL    EnableItem(BOOL bEnable);
 	virtual void    ParseToolbar(CToolBar *pToolbar);
 	virtual BOOL    HitTest(CPoint point);
-	CDirectUIItem(CString strName, UINT uiCommand, int nIconIndex = -1);
+	CDirectUIItem(CString strName, UINT uiCommand, int nIconIndex, CImageList* pImageList=NULL);
 	virtual void    OnDraw(CDC* pDC, CRect rcItem, CImageList* pImageList, int nStyle, HTHEME hTheme, int nOffsetY, CWnd* pParent);
 	virtual int     GetItemHeight(CDC* pDC, int nStyle, HTHEME hTheme);
 	virtual CString& GetText() {return m_strName;};
@@ -145,7 +145,7 @@ public:
 
 	// Konstruktion
 	CWndDirectUI();
-	CWndDirectUI(CExpBarContext* cont, CBLContext* pUDC);
+	CWndDirectUI(CExpBarContext* cont);
 	enum Styles {
 		styleXP        =       0x01,
 		styleOffice    =       0x02,
@@ -268,6 +268,7 @@ public:
 	
 	BL_BEGIN_CONTEXT("ExplorerBar", "ExplorerBar");
 	BL_FUNC(AddGroup,"AddGroup",1);
+	BL_FUNC(SetImageList,"SetImageList",2);
 	BL_PROC(SetStyle,"SetStyle",1);
 	BL_END_CONTEXT();
 
