@@ -499,7 +499,7 @@ int     CDirectUIItem::GetItemHeight(CDC* pDC, int nStyle, HTHEME hTheme)
 	return m_nHeight;
 };
 
-CDirectUIItem::CDirectUIItem(CString strName, UINT uiCommand, int nIconIndex)
+CDirectUIItem::CDirectUIItem(CString strName, UINT uiCommand, int nIconIndex=-1, CImageList* pImageList)
 {
 	m_rcItem.SetRectEmpty();
 	m_strName    = strName;
@@ -507,6 +507,12 @@ CDirectUIItem::CDirectUIItem(CString strName, UINT uiCommand, int nIconIndex)
 	m_uiCommand  = uiCommand;
 	m_uiItemState= 0;
 	m_nHeight    = -1;
+	IMAGEINFO imgInfo;
+	if ((m_nIconIndex != -1) && (pImageList))
+	{
+		pImageList->GetImageInfo(m_nIconIndex,&imgInfo);
+		m_nHeight=__max(imgInfo.rcImage.bottom-imgInfo.rcImage.top,MulDiv(GetSystemMetrics(SM_CYMENU), 9, 8));
+	}
 	if (!m_hCursorHand) m_hCursorHand = AfxGetApp()->LoadCursor(IDC_MYHAND);
 }
 
@@ -525,8 +531,14 @@ void CDirectUIItem::OnDraw(CDC* pDC, CRect rcItem, CImageList* pImageList, int n
 {
 	const nBorderX     = 10;
 	const nBorderIconX = 4;
-	const nIconSize    = 16;
+	int nIconSize    = 0;
+	IMAGEINFO imgInfo;
 
+	if ((m_nIconIndex != -1) && (pImageList))
+	{
+		pImageList->GetImageInfo(m_nIconIndex,&imgInfo);
+		nIconSize=imgInfo.rcImage.right-imgInfo.rcImage.left;
+	}
 	switch (nStyle)
 	{
 	case CWndDirectUI::styleXP:
@@ -758,11 +770,10 @@ CWndDirectUI::CWndDirectUI()
 	m_hHand         = AfxGetApp()->LoadCursor(IDC_MYHAND);
 	VERIFY(m_hHand);  // If asserts, add this cursor to your resource
 	m_nStyle        = styleThemed;
-	m_lstImages.Create(1, 1, ILC_COLOR,1, 1);
 	RegisterWindowClass();
 }
 
-CWndDirectUI::CWndDirectUI(CExpBarContext* cont, CBLContext* pUDC) :
+CWndDirectUI::CWndDirectUI(CExpBarContext* cont) :
 m_pEBContext(cont),CWnd()
 {
 	m_pLastHitItem  = NULL;
@@ -770,12 +781,13 @@ m_pEBContext(cont),CWnd()
 	m_hHand         = AfxGetApp()->LoadCursor(IDC_MYHAND);
 	VERIFY(m_hHand);  // If asserts, add this cursor to your resource
 	m_nStyle        = styleThemed;
-	m_lstImages.Create(1, 1, ILC_COLOR,1, 1);
 	RegisterWindowClass();
 }
 
 CWndDirectUI::~CWndDirectUI() 
 {
+	if(m_lstImages.GetSafeHandle())
+		m_lstImages.DeleteImageList();
 	RemoveAll();
 }
 

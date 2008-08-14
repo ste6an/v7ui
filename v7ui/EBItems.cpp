@@ -45,7 +45,7 @@ CEBItemContext::CEBItemContext()
 
 CEBItemContext::CEBItemContext(CString sCaption, CDirectUIGroup* pGroup, int nIconIndex, CValue& value)
 {
-	m_pItem=new CDirectUIItem(sCaption,0,nIconIndex);
+	m_pItem=new CDirectUIItem(sCaption,0,nIconIndex,pGroup->m_pImageList);
 	m_pItem->m_ItemValue=value;
 	pGroup->AddItem(m_pItem);
 }
