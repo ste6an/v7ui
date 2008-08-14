@@ -268,6 +268,7 @@ public:
 	
 	BL_BEGIN_CONTEXT("ExplorerBar", "ExplorerBar");
 	BL_FUNC(AddGroup,"AddGroup",1);
+	BL_PROC(SetStyle,"SetStyle",1);
 	BL_END_CONTEXT();
 
 	void OnItemClick(CDirectUIItem* pItem);
