@@ -735,7 +735,7 @@ BOOL CDirectUIItem::MouseItemLUp(CPoint point, CPoint ptOffset, CWnd* pParent)
 BEGIN_MESSAGE_MAP(CWndDirectUI, CWnd)
 	//{{AFX_MSG_MAP(CWndDirectUI)
 	ON_WM_PAINT()
-//	ON_WM_ERASEBKGND()
+	ON_WM_ERASEBKGND()
 	ON_WM_SETCURSOR()
 	ON_WM_LBUTTONDOWN()
 	ON_WM_MOUSEMOVE()
@@ -772,7 +772,6 @@ m_pEBContext(cont),CWnd()
 	m_nStyle        = styleThemed;
 	m_lstImages.Create(1, 1, ILC_COLOR,1, 1);
 	RegisterWindowClass();
-	m_pHiContext = pUDC ? pUDC : cont;
 }
 
 CWndDirectUI::~CWndDirectUI() 
@@ -910,14 +909,14 @@ void CWndDirectUI::RemoveAll()
 	while (m_lstGroups.GetCount()) delete m_lstGroups.RemoveHead();
 }
 
-int CWndDirectUI::AddGroup(CString strName)
+CDirectUIGroup* CWndDirectUI::AddGroup( CString strName )
 {
 	CDirectUIGroup* pGroup = new CDirectUIGroup(strName, &m_lstImages, &m_nStyle);
 	m_lstGroups.AddTail(pGroup);
 
 	InvalidateIfPossible();
 	
-	return m_lstGroups.GetCount()-1;
+	return pGroup;
 }
 
 BOOL CWndDirectUI::RemoveGroup(int nGroup)
@@ -1085,6 +1084,7 @@ void CWndDirectUI::OnLButtonUp(UINT nFlags, CPoint point)
 	if (m_pLastHitItem)
 	{
 		if (m_pLastHitItem->MouseItemLUp(point, CPoint(GetOffsetX(), GetOffsetY()),GetParent())) InvalidateIfPossible();
+		m_pEBContext->OnItemClick(m_pLastHitItem);
 	}
 	//CWnd::OnLButtonUp(nFlags, point);
 }
@@ -1547,3 +1547,4 @@ CDirectUIItemEdit::~CDirectUIItemEdit()
 	if (m_pEdit)
 		m_pEdit->DestroyWindow();
 }
+

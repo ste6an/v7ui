@@ -96,6 +96,10 @@ SOURCE=.\ControlBarContext.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\EBItems.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\ExpBarContext.cpp
 # End Source File
 # Begin Source File
@@ -145,6 +149,10 @@ SOURCE=.\WndDirectUI.cpp
 # Begin Source File
 
 SOURCE=.\ControlBarContext.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\EBItems.h
 # End Source File
 # Begin Source File
 

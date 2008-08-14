@@ -15,6 +15,17 @@ static char THIS_FILE[]=__FILE__;
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
+enum ExpBarEvents
+{
+    ebOnItemClick,
+	ebLastEvent
+};
+
+stCtrlEvents CEBCtrlEvents[]  =  
+{
+    {"OnItemClick", "OnItemClick", 1}
+};
+
 BL_INIT_CONTEXT(CExpBarContext);
 
 CExpBarContext::CExpBarContext()
@@ -51,6 +62,7 @@ BOOL CExpBarContext::CreateControlWndEx(CWnd* pParent)
 		if (bSuccess)
 		{
 			pControlWnd->DestroyWindow();
+			m_EventManager.SetEvents(CEBCtrlEvents, ebLastEvent, pControlID, m_pDoc->m_pBLModule, this, m_pUDC);
 		}
 	}
 	
@@ -65,4 +77,21 @@ BOOL CExpBarContext::CreateControlWnd(CWnd* pParent, CGetDoc7* pDoc, CGetField* 
 	m_pUDC = pUDC;
 	
 	return CreateControlWndEx(pParent);
+}
+
+BOOL CExpBarContext::AddGroup(CValue& retVal, CValue** ppParams)
+{
+	retVal.AssignContext(new CEBGroupContext(ppParams[0]->GetString(),m_pExpBar));
+	return TRUE;
+}
+
+
+void CExpBarContext::OnItemClick( CDirectUIItem* pItem )
+{
+	if (m_EventManager.IsAppointed(ebOnItemClick))
+	{
+		CValue val=pItem->m_ItemValue;
+		CExecBatchHelper ExecBatchHelper(m_pDoc, TRUE);
+		m_EventManager.Invoke1(ebOnItemClick, val);
+	}
 }
